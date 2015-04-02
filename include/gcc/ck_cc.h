@@ -98,6 +98,11 @@
 #define CK_CC_ALIASED __attribute__((__may_alias__))
 
 /*
+ * Compile-time typeof
+ */
+#define CK_CC_F_TYPEOF __typeof__
+
+/*
  * Portability wrappers for bitwise ops.
  */
 
