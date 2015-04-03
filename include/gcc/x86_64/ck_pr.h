@@ -147,7 +147,7 @@ CK_PR_FAS_S(8,  uint8_t,  "xchgb")
  */
 #define CK_PR_LOAD(S, M, T, C, I)				\
 	CK_CC_INLINE static T					\
-	ck_pr_load_##S(const M *target)				\
+	ck_pr_md_load_##S(const M *target)			\
 	{							\
 		T r;						\
 		__asm__ __volatile__(I " %1, %0"		\
