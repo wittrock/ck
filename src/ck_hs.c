@@ -239,7 +239,7 @@ ck_hs_reset_size(struct ck_hs *hs, unsigned long capacity)
 	if (map == NULL)
 		return false;
 
-	ck_pr_store_ptr_unsafe(&hs->map, map);
+	ck_pr_store_ptr(&hs->map, map);
 	ck_hs_map_destroy(hs->m, previous, true);
 	return true;
 }
@@ -375,7 +375,7 @@ restart:
 	}
 
 	ck_pr_fence_store();
-	ck_pr_store_ptr_unsafe(&hs->map, update);
+	ck_pr_store_ptr(&hs->map, update);
 	ck_hs_map_destroy(hs->m, map, true);
 	return true;
 }
@@ -585,9 +585,9 @@ ck_hs_gc(struct ck_hs *hs, unsigned long cycles, unsigned long seed)
 		if (first != NULL) {
 			const void *insert = ck_hs_marshal(hs->mode, entry, h);
 
-			ck_pr_store_ptr_unsafe(first, insert);
+			ck_pr_store_ptr(first, (void *)insert);
 			ck_hs_map_signal(map, h);
-			ck_pr_store_ptr_unsafe(slot, CK_HS_TOMBSTONE);
+			ck_pr_store_ptr(slot, CK_HS_TOMBSTONE);
 		}
 
 		if (cycles == 0) {
@@ -642,11 +642,11 @@ ck_hs_fas(struct ck_hs *hs,
 	insert = ck_hs_marshal(hs->mode, key, h);
 
 	if (first != NULL) {
-		ck_pr_store_ptr_unsafe(first, insert);
+		ck_pr_store_ptr(first, (void *)insert);
 		ck_hs_map_signal(map, h);
-		ck_pr_store_ptr_unsafe(slot, CK_HS_TOMBSTONE);
+		ck_pr_store_ptr(slot, CK_HS_TOMBSTONE);
 	} else {
-		ck_pr_store_ptr_unsafe(slot, insert);
+		ck_pr_store_ptr(slot, (void *)insert);
 	}
 
 	*previous = object;
@@ -698,7 +698,7 @@ restart:
 			return true;
 
 		/* Otherwise, mark slot as deleted. */
-		ck_pr_store_ptr_unsafe(slot, CK_HS_TOMBSTONE);
+		ck_pr_store_ptr(slot, CK_HS_TOMBSTONE);
 		map->n_entries--;
 		map->tombstones++;
 		return true;
@@ -717,18 +717,18 @@ restart:
 		 * This follows the same semantics as ck_hs_set, please refer to that
 		 * function for documentation.
 		 */
-		ck_pr_store_ptr_unsafe(first, insert);
+		ck_pr_store_ptr(first, (void *)insert);
 
 		if (object != NULL) {
 			ck_hs_map_signal(map, h);
-			ck_pr_store_ptr_unsafe(slot, CK_HS_TOMBSTONE);
+			ck_pr_store_ptr(slot, CK_HS_TOMBSTONE);
 		}
 	} else {
 		/*
 		 * If we are storing into same slot, then atomic store is sufficient
 		 * for replacement.
 		 */
-		ck_pr_store_ptr_unsafe(slot, insert);
+		ck_pr_store_ptr(slot, (void *)insert);
 	}
 
 	if (object == NULL)
@@ -766,7 +766,7 @@ restart:
 
 	if (first != NULL) {
 		/* If an earlier bucket was found, then store entry there. */
-		ck_pr_store_ptr_unsafe(first, insert);
+		ck_pr_store_ptr(first, (void *)insert);
 
 		/*
 		 * If a duplicate key was found, then delete it after
@@ -777,14 +777,14 @@ restart:
 		 */
 		if (object != NULL) {
 			ck_hs_map_signal(map, h);
-			ck_pr_store_ptr_unsafe(slot, CK_HS_TOMBSTONE);
+			ck_pr_store_ptr(slot, CK_HS_TOMBSTONE);
 		}
 	} else {
 		/*
 		 * If we are storing into same slot, then atomic store is sufficient
 		 * for replacement.
 		 */
-		ck_pr_store_ptr_unsafe(slot, insert);
+		ck_pr_store_ptr(slot, (void *)insert);
 	}
 
 	if (object == NULL)
@@ -827,10 +827,10 @@ restart:
 
 	if (first != NULL) {
 		/* Insert key into first bucket in probe sequence. */
-		ck_pr_store_ptr_unsafe(first, insert);
+		ck_pr_store_ptr(first, (void *)insert);
 	} else {
 		/* An empty slot was found. */
-		ck_pr_store_ptr_unsafe(slot, insert);
+		ck_pr_store_ptr(slot, (void *)insert);
 	}
 
 	ck_hs_map_postinsert(hs, map);
@@ -896,7 +896,7 @@ ck_hs_remove(struct ck_hs *hs,
 	if (object == NULL)
 		return NULL;
 
-	ck_pr_store_ptr_unsafe(slot, CK_HS_TOMBSTONE);
+	ck_pr_store_ptr(slot, CK_HS_TOMBSTONE);
 	map->n_entries--;
 	map->tombstones++;
 	return object;

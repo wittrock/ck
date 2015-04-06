@@ -1159,9 +1159,10 @@ CK_PR_FAS_S(8, uint8_t)
 #undef CK_PR_FAA
 #undef CK_PR_FAS
 
-#define CK_PR_STORE_SAFE(DST, VAL, TYPE) ck_pr_md_store_##TYPE(	\
-    ((void)(sizeof(*(DST) = (VAL))), (DST)),			\
-    (VAL))
+#define CK_PR_STORE_SAFE(DST, VAL, TYPE)			\
+    ck_pr_md_store_##TYPE(					\
+        ((void)sizeof(*(DST) = (VAL)), (DST)),			\
+        (VAL))
 
 #define ck_pr_store_ptr(DST, VAL) CK_PR_STORE_SAFE((DST), (VAL), ptr)
 #define ck_pr_store_char(DST, VAL) CK_PR_STORE_SAFE((DST), (VAL), char)
@@ -1178,9 +1179,10 @@ CK_PR_FAS_S(8, uint8_t)
 #define ck_pr_store_64(DST, VAL) CK_PR_STORE_SAFE((DST), (VAL), 64)
 #endif /* CK_F_PR_LOAD_64 */
 
-#define CK_PR_LOAD_SAFE(SRC, TYPE) ((CK_CC_TYPEOF(*(SRC), (void *)))ck_pr_md_load_##TYPE((SRC)))
+#define CK_PR_LOAD_PTR_SAFE(SRC) (CK_CC_TYPEOF(*(SRC), (void *)))ck_pr_md_load_ptr((SRC))
+#define ck_pr_load_ptr(SRC) CK_PR_LOAD_PTR_SAFE((SRC))
 
-#define ck_pr_load_ptr(SRC) CK_PR_LOAD_SAFE((SRC), ptr)
+#define CK_PR_LOAD_SAFE(SRC, TYPE) ck_pr_md_load_##TYPE((SRC))
 #define ck_pr_load_char(SRC) CK_PR_LOAD_SAFE((SRC), char)
 #define ck_pr_load_double(SRC) CK_PR_LOAD_SAFE((SRC), double)
 #define ck_pr_load_uint(SRC) CK_PR_LOAD_SAFE((SRC), uint)

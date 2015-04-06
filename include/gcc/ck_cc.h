@@ -100,7 +100,7 @@
 /*
  * Compile-time typeof
  */
-#define CK_CC_F_TYPEOF __typeof__
+#define CK_CC_TYPEOF(X, DEFAULT) __typeof__(X)
 
 /*
  * Portability wrappers for bitwise ops.
